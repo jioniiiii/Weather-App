@@ -19,6 +19,7 @@ async function getWeather(loc) {
       };
 }
 
+//search box
 form.addEventListener('submit', async (event) => {
     event.preventDefault(); //prevent reload
     let location = document.getElementById('address').value;
@@ -29,19 +30,43 @@ form.addEventListener('submit', async (event) => {
     console.log('Searching for weather data for location:', location);
     const weatherData = await getWeather(location);
     if (weatherData) {
-        console.log('Weather data:', weatherData.resolvedAddress);
-        this.address = JSON.stringify(weatherData.resolvedAddress);
-        console.log(this.address);
-        display();
+        const dataObject = processData(weatherData);
+        display(dataObject);
     } else {
         outputElement.textContent = 'Unable to retrieve weather data. Please check the location and try again.';
     }
 });
 
-function Data(address) {
-    this.address = address;
+
+function display(dataObject) {
+    document.querySelector('.location').textContent = dataObject.currentL;
+    document.querySelector('.degrees').textContent = `Current Temperature: ${dataObject.currentT.c}°C / ${dataObject.currentT.f}°F`;
+    document.querySelector('.description').textContent = `Description: ${dataObject.desc}`;
+    document.querySelector('.feelslike').textContent = `Feels Like: ${dataObject.feelsLike.c}°C / ${dataObject.feelsLike.f}°F`;
+    document.querySelector('.humidity').textContent = `Humidity: ${dataObject.humidity}%`;
+    document.querySelector('.wind').textContent = `Wind Speed: ${dataObject.wind} km/h`;
 }
 
-function display() {
-    outputElement.innerHTML = this.address;
+function processData(weatherData) {
+    const currentConditions = weatherData.currentConditions;
+    const today = weatherData.days[0];
+
+    const myData = {
+        currentL: weatherData.resolvedAddress,
+        wind: currentConditions.windspeed,
+        humidity: currentConditions.humidity,
+        desc: currentConditions.description,
+
+        feelsLike: {
+            c: Math.round((currentConditions.temp - 32) * 5/9),
+            f: currentConditions.feelslike
+        },
+        currentT: {
+            c: Math.round((currentConditions.temp - 32) * 5/9),
+            f: currentConditions.feelslike
+        }
+    }
+
+    console.log(myData);
+    return myData;
 }
