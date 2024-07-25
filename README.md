@@ -7,3 +7,4 @@ Building a Weather App with JavaScript to learn more about APIs
     -add f/c button
     -fix api key
     -make ui
+    -fix search box (make search more orginized)
