@@ -13,8 +13,9 @@ body {
 
 .search {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
+    gap: 700px; /*fix this so its better*/
     padding: 0.5rem;
     margin-bottom: 2rem;
 }
@@ -92,6 +93,12 @@ input::placeholder {
     font-weight: 600;
 }
 
+.weather-icon {
+  width: 52px; 
+  height: 52px;
+  margin-bottom: 0.6rem; 
+}
+
 /* INFO BOT */
 
 .time, .date, .timezone {
@@ -103,14 +110,32 @@ input::placeholder {
 /* EXTRA */
 
 .extra {
-    padding-top: 3rem;/*fix this so is in center when add extra info*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-items: flex-start;
+    margin-top: 1.7rem;
 }
 
 .extra-cont {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
+    justify-content: center;
     margin-bottom: 3rem;
+}
+
+.extra-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.temp-icon, .humidity-icon, .wind-icon, .rain-icon {
+  width: 52px; 
+  height: 52px;
+  margin-right: 10px; 
 }
 
 .feelslikeText, .humidityText, .windText, .probRainText {
