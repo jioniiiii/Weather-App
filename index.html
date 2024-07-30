@@ -21,7 +21,7 @@
           </label>
     </div>
 
-    <div class="output-cont">
+    <div id="output-cont" class="output-cont">
         <div class="info">
             <div class="info-top">
                 <h1 class="location"></h1>
@@ -66,8 +66,21 @@
             </div>
         </div>
     </div>
+    <div class="forecast-cont">
+        <div class="card">
+            <div class="day"></div>
+            <div class="temp">
+                <div class="temp-high"></div>
+                <div class="temp-low"></div>
+            </div>
+            <div class="icon-forecast"></div>
+        </div>
+    </div>
 
     <div id="output"></div>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
 <script src="script.js"></script>    
 </body>
 </html>
