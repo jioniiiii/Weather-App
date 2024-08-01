@@ -20,11 +20,10 @@ const dateElem = document.querySelector('.date');
 const timeElem = document.querySelector('.time');
 const timezoneElem = document.querySelector('.timezone');
 const loadingDisplay = document.getElementById('loading');
+const cardsCont = document.querySelector('.forecast-cont');
 
 //local storage
 let weatherData = null;
-//image flag so it doesnt load when display reloads
-let imgFlag = true;
 
 //for time displaying because api doesnt have excat time but time the data was pulled 
 let now = new Date();
@@ -36,16 +35,18 @@ let formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().p
 function showLoading() {
     loadingDisplay.style.display = 'flex';
     outputElementCont.style.display = 'none';  
+    cardsCont.style.display = 'none';  
 }
 
 function hideLoading() {
     loadingDisplay.style.display = 'none';
     outputElementCont.style.display = 'flex';
+    cardsCont.style.display = 'flex';  
 }
 
 //fetching weather data
 async function getWeather(loc) {
-    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${loc}/?key=A3P4BNCJFTAKTVZYHEEB2WMNP`
+    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${loc}/?key=A3P4BNCJFTAKTVZYHEEB2WMNP`//proper solution for security server-side call
     try {
         const response = await fetch(url);
         if(!response.ok){
@@ -58,7 +59,6 @@ async function getWeather(loc) {
         console.error(err);
       }
 }
-
 
 //search box
 form.addEventListener('submit', handleFormSubmit);
@@ -82,7 +82,6 @@ async function handleFormSubmit(event) {
         hideLoading();
         displayForecast(dataObject);
         display(dataObject);
-        imgFlag = true;
     } 
     else {
         outputElement.textContent = 'Unable to retrieve weather data. Please check the location and try again.';
@@ -90,16 +89,15 @@ async function handleFormSubmit(event) {
 }
 
 function display(dataObject) {
-    const { currentTemp, feelTemp } = updateTemp(dataObject);
     //info top
     locationElem.textContent = dataObject.currentL.charAt(0).toUpperCase() + dataObject.currentL.slice(1).toLowerCase();
     loadImage(weatherIconElem, loadInfoImg(dataObject.icon0));
-    degreesElem.textContent = currentTemp;
+    degreesElem.textContent = tempSwitch.checked ? `${dataObject.currentT.c}°C` : `${dataObject.currentT.f}°F`;
     descriptionElem.textContent = dataObject.desc;
     //extra info
     loadExtraImg();
     feelsLikeTextElem.textContent = `Feels Like`;
-    feelsLikeElem.textContent = feelTemp;
+    feelsLikeElem.textContent = tempSwitch.checked ? `${dataObject.feelsLike.c}°C` : `${dataObject.feelsLike.f}°F`;
     humidityTextElem.textContent = `Humidity`;
     humidityElem.textContent = `${dataObject.humidity}%`;
     probRainTextElem.textContent = `Chance of Rain`;
@@ -156,77 +154,56 @@ function processData(weatherData) {
     return myData;
 }
 
-//toggle switch logic
-function updateTemp(dataObject) {
-    if(tempSwitch.checked) {
-        return {
-            currentTemp: `${dataObject.currentT.c}°C`,
-            feelTemp: `${dataObject.feelsLike.c}°C`,
-            tMax: `${dataObject.forecasts[1].tMax.c}°C`,
-            tMin: `${dataObject.forecasts[1].tMin.c}°C`
-        };
-    }
-    else {
-        return {
-            currentTemp: `${dataObject.currentT.f}°F`,
-            feelTemp: `${dataObject.feelsLike.f}°F`,
-            tMax: `${dataObject.forecasts.days.tMax.f}°F`,
-            tMin: `${dataObject.forecasts.days.tMin.f}°F`,
-        };
-    }
-}
-
+//toggle switch 
 tempSwitch.addEventListener('change', () => {
-    const tempHighDiv = document.querySelector('.temp-high');
-    const tempLowDiv = document.querySelector('.temp-low');
     if (weatherData) { 
         const dataObject = processData(weatherData);
-        const { currentTemp, feelTemp, tMax, tMin} = updateTemp(dataObject);
-        degreesElem.textContent = currentTemp;
-        feelsLikeElem.textContent = feelTemp;
-        tempHighDiv.textContent = tMax;
-        tempLowDiv.textContent = tMin;
+        display(dataObject); 
+        displayForecast(dataObject);
     }
 });
 
 //for svgs
 function loadInfoImg(condition) {
-    
-    if(imgFlag){
+    let now = new Date();
+    let hour = now.getHours();
+    let isNight = hour >= 20 || hour < 6;
 
-        const icons = {
-            "clear-day": "img/svg/sun.svg",
-            "wind": "img/svg/wind.svg",
-            "cloudy": "img/svg/cloudy.svg",
-            "rain": "img/svg/rainy.svg",
-            "partly-cloudy-day": "img/svg/cloudy-day.svg",
-            "snow-showers-day": "img/svg/snow-showers-day.svg",
-            "thunder-rain": "img/svg/lightning.svg",
-            "thunder-showers-day": "img/svg/tlightning.svg",
-            "showers-day": "img/svg/rainy.svg",
-            "snow": "img/svg/snow.svg",
-            "fog": "img/svg/fog.svg",
-            };
+    const icons = {
+        "clear-day": "img/svg/sun.svg",
+        "wind": "img/svg/wind.svg",
+        "cloudy": "img/svg/cloudy.svg",
+        "rain": "img/svg/rainy.svg",
+        "partly-cloudy-day": "img/svg/cloudy-day.svg",
+        "snow-showers-day": "img/svg/snow-showers-day.svg",
+        "thunder-rain": "img/svg/lightning.svg",
+        "thunder-showers-day": "img/svg/tlightning.svg",
+        "showers-day": "img/svg/rainy.svg",
+        "snow": "img/svg/snow.svg",
+        "fog": "img/svg/fog.svg",
+        };
+
+    const nightIcons = {
+        "clear-night": "img/svg/moon.svg",
+        "cloudy-night": "img/svg/cloudy-night.svg",
+    };
         
-           return icons[condition];
-    }
+    return isNight ? nightIcons[condition] || nightIcons["cloudy-night"] : icons[condition] || icons["cloudy"];
 }
 
 function loadExtraImg() {
-    if(imgFlag) {
-        const icons = {
-            temp: 'img/svg/thermo.svg',
-            humidity: 'img/svg/humidity.svg',
-            wind: 'img/svg/wind.svg',
-            rain: 'img/svg/rainy.svg',
-        };
 
-        Object.keys(icons).forEach(key => {
-            loadImage(document.querySelector(`.${key}-icon`), icons[key]);
-        });
+    const icons = {
+        temp: 'img/svg/thermo.svg',
+        humidity: 'img/svg/humidity.svg',
+        wind: 'img/svg/wind.svg',
+        rain: 'img/svg/rainy.svg',
+    };
 
-        imgFlag = false;
-    }
+    Object.keys(icons).forEach(key => {
+        loadImage(document.querySelector(`.${key}-icon`), icons[key]);
+    });
+    
 }
 
 //to laod the svgs
@@ -234,12 +211,12 @@ function loadImage(container, src) {
     container.innerHTML = ''; 
     const img = document.createElement('img');
     img.src = src;
+    img.onerror = () => console.error(`Failed to load image: ${src}`);
     container.appendChild(img);
 }
 
 //for days card
 function displayForecast(dataObject) {
-    const { tMax, tMin } = updateTemp(dataObject);//check this 
     const forecastContainer = document.querySelector('.forecast-cont'); 
 
     forecastContainer.innerHTML = '';
@@ -257,15 +234,16 @@ function displayForecast(dataObject) {
         
         const tempHighDiv = document.createElement('div');
         tempHighDiv.classList.add('temp-high');
-        tempHighDiv.textContent = `${tMax}`;
+        tempHighDiv.textContent = tempSwitch.checked ? `${day.tMax.c}°C` : `${day.tMax.f}°F`;
         
         const tempLowDiv = document.createElement('div');
         tempLowDiv.classList.add('temp-low');
-        tempLowDiv.textContent = `${tMin}`;
+        tempLowDiv.textContent = tempSwitch.checked ? `${day.tMin.c}°C` : `${day.tMin.f}°F`;
         
         tempDiv.appendChild(tempHighDiv);
         tempDiv.appendChild(tempLowDiv);
-    
+        
+   
         const iconDiv = document.createElement('div');
         iconDiv.classList.add('icon-forecast');
         loadImage(iconDiv,loadInfoImg(day.icon));
@@ -287,7 +265,7 @@ function roundTo(num, precision) {
 //for finding the dya of the week
 function getDayOfWeek(dateStr) {
     const date = new Date(dateStr);
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];    
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];    
     const dayIndex = date.getDay();
     return daysOfWeek[dayIndex];
 }

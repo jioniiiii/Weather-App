@@ -10,13 +10,14 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
     }
 
 /* SEARCH */
 
 .search {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
     gap: 700px; /*fix this so its better*/
     padding: 0.5rem;
@@ -226,7 +227,7 @@ input::placeholder {
     right: 10px;
   }
 
-  /* for loading display */
+/* for loading display */
 
   .loading {
     display: none;
@@ -255,7 +256,7 @@ input::placeholder {
     100% { transform: rotate(360deg); }
   }
 
-  /* forcast */
+/* forcast */
   
   .forecast-cont {
     display: flex;
@@ -299,3 +300,59 @@ input::placeholder {
     height: 52px;
     margin-top: 2rem;
   }
+
+/* MEDIA QUERIES */
+
+@media (max-width: 950px) {
+  body {
+    overflow: scroll;
+    background-color: hsl(303, 50%, 7%);
+  }
+
+  .search {
+      flex-direction: column;
+      gap: 1rem;
+  }
+
+  form {
+      width: 100%;
+  }
+
+  .info {
+      align-items: center;
+      text-align: center;
+  }
+
+  .extra-cont {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .temp-icon, .humidity-icon, .wind-icon, .rain-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 4px;
+  }
+
+  .extra-info {
+      text-align: center;
+  }
+
+  .forecast-cont {
+      flex-direction: column;
+  }
+
+  .card {
+      margin-bottom: 1rem;
+  }
+}
+
+/* for toggle switch */
+
+@media (max-width: 1100px) {
+  .search {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+  }
+}
